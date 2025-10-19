@@ -91,16 +91,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       try {
         const token = authService.getCurrentToken();
-        const user = authService.getCurrentUser();
+        const storedUser = authService.getCurrentUser();
 
-        if (token && user) {
-          dispatch({
-            type: 'LOGIN_SUCCESS',
-            payload: { user, token },
-          });
+        if (token && storedUser) {
+          try {
+            const freshUser = await authService.getProfile();
+            localStorage.setItem('auth_user', JSON.stringify(freshUser));
+            dispatch({
+              type: 'LOGIN_SUCCESS',
+              payload: { user: freshUser, token },
+            });
+          } catch (error) {
+            console.warn('No se pudo actualizar el perfil, usando datos locales:', error);
+            dispatch({
+              type: 'LOGIN_SUCCESS',
+              payload: { user: storedUser, token },
+            });
+          }
         } else {
           dispatch({ type: 'SET_LOADING', payload: false });
         }

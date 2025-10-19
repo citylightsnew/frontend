@@ -1,12 +1,13 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import { API_BASE_URL } from '../types';
-import type { ApiErrorResponse } from '../types';
+import type { ApiErrorResponse, RoleCategoria } from '../types';
 
 export interface Role {
   id: string;
   name: string;
   description: string;
+  categoria: RoleCategoria;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -14,11 +15,13 @@ export interface Role {
 export interface CreateRoleRequest {
   name: string;
   description: string;
+  categoria: RoleCategoria;
 }
 
 export interface UpdateRoleRequest {
   name?: string;
   description?: string;
+  categoria?: RoleCategoria;
 }
 
 export interface PaginatedRolesResponse {

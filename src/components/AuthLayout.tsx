@@ -19,8 +19,8 @@ export default function AuthLayout({
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="flex min-h-screen">
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 relative overflow-hidden">
-          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-          <div className="absolute top-20 left-20 w-72 h-72 bg-white bg-opacity-10 rounded-full blur-3xl"></div>
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-400 bg-opacity-20 rounded-full blur-3xl"></div>
           <div className="relative z-10 flex flex-col justify-center px-12 py-24 text-white">
             <div className="max-w-md">

@@ -48,7 +48,6 @@ class AuthService {
       (error) => {
         if (error.response?.status === 401) {
           this.clearStoredAuth();
-          // Redirigir solo si no estamos ya en login/register
           if (!window.location.pathname.includes('/login') && 
               !window.location.pathname.includes('/register') &&
               !window.location.pathname.includes('/verify-email')) {

@@ -29,6 +29,7 @@ export default function UsersManagement() {
   });
   
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoriaFilter, setCategoriaFilter] = useState<'todos' | 'superusuario' | 'trabajador' | 'residente'>('todos');
 
   useEffect(() => {
     loadData();
@@ -152,10 +153,15 @@ export default function UsersManagement() {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategoria = categoriaFilter === 'todos' || 
+      user.role?.categoria === categoriaFilter;
+    
+    return matchesSearch && matchesCategoria;
+  });
 
   if (loading) {
     return (
@@ -164,6 +170,12 @@ export default function UsersManagement() {
       </div>
     );
   }
+  const stats = {
+    total: users.length,
+    superusuarios: users.filter(u => u.role?.categoria === 'superusuario').length,
+    trabajadores: users.filter(u => u.role?.categoria === 'trabajador').length,
+    residentes: users.filter(u => u.role?.categoria === 'residente').length,
+  };
 
   return (
     <div>
@@ -177,6 +189,48 @@ export default function UsersManagement() {
         </Button>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+            </div>
+            <div className="text-3xl">📋</div>
+          </div>
+        </div>
+        
+        <div className="bg-purple-50 rounded-lg shadow p-4 border border-purple-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-purple-700">Superusuarios</p>
+              <p className="text-2xl font-bold text-purple-900">{stats.superusuarios}</p>
+            </div>
+            <div className="text-3xl">👑</div>
+          </div>
+        </div>
+        
+        <div className="bg-blue-50 rounded-lg shadow p-4 border border-blue-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-blue-700">Trabajadores</p>
+              <p className="text-2xl font-bold text-blue-900">{stats.trabajadores}</p>
+            </div>
+            <div className="text-3xl">👷</div>
+          </div>
+        </div>
+        
+        <div className="bg-green-50 rounded-lg shadow p-4 border border-green-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-green-700">Residentes</p>
+              <p className="text-2xl font-bold text-green-900">{stats.residentes}</p>
+            </div>
+            <div className="text-3xl">🏠</div>
+          </div>
+        </div>
+      </div>
+
       {error && (
         <Alert type="error" message={error} onClose={() => setError(null)} className="mb-4" />
       )}
@@ -184,8 +238,8 @@ export default function UsersManagement() {
         <Alert type="success" message={success} onClose={() => setSuccess(null)} className="mb-4" />
       )}
 
-      <div className="mb-4">
-        <div className="relative">
+      <div className="mb-4 flex gap-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
@@ -195,7 +249,51 @@ export default function UsersManagement() {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+        
+        <div className="w-64">
+          <select
+            value={categoriaFilter}
+            onChange={(e) => setCategoriaFilter(e.target.value as 'todos' | 'superusuario' | 'trabajador' | 'residente')}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+          >
+            <option value="todos">📋 Todos los usuarios</option>
+            <option value="superusuario">👑 Superusuarios</option>
+            <option value="trabajador">👷 Trabajadores</option>
+            <option value="residente">🏠 Residentes</option>
+          </select>
+        </div>
       </div>
+
+      {(searchTerm || categoriaFilter !== 'todos') && (
+        <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+          <div className="flex items-center gap-2 text-sm text-blue-800">
+            <span className="font-medium">
+              Mostrando {filteredUsers.length} de {users.length} usuarios
+            </span>
+            {searchTerm && (
+              <span className="text-blue-600">
+                • Búsqueda: "{searchTerm}"
+              </span>
+            )}
+            {categoriaFilter !== 'todos' && (
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+                {categoriaFilter === 'superusuario' && '👑 Superusuarios'}
+                {categoriaFilter === 'trabajador' && '👷 Trabajadores'}
+                {categoriaFilter === 'residente' && '🏠 Residentes'}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => {
+              setSearchTerm('');
+              setCategoriaFilter('todos');
+            }}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
@@ -243,9 +341,22 @@ export default function UsersManagement() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {user.roleName}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                          {user.roleName}
+                        </span>
+                        {user.role?.categoria && (
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            user.role.categoria === 'superusuario' ? 'bg-purple-100 text-purple-700' :
+                            user.role.categoria === 'trabajador' ? 'bg-orange-100 text-orange-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {user.role.categoria === 'superusuario' ? 'Superusuario' :
+                             user.role.categoria === 'trabajador' ? 'Trabajador' :
+                             'Residente'}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.telephone || '-'}
@@ -295,7 +406,7 @@ export default function UsersManagement() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900">
@@ -415,7 +526,7 @@ export default function UsersManagement() {
       )}
 
       {showDeleteModal && userToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <div className="flex items-center justify-center mb-4">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">

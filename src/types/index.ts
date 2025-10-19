@@ -1,3 +1,5 @@
+export type RoleCategoria = 'superusuario' | 'trabajador' | 'residente';
+
 export interface User {
   id: string;
   name: string;
@@ -5,11 +7,12 @@ export interface User {
   telephone?: string;
   emailVerified: boolean;
   twoFactorEnabled: boolean;
-  roleName: 'admin' | 'user';
+  roleName: string;
   role?: {
     id: string;
     name: string;
     description: string;
+    categoria: RoleCategoria;
   };
   createdAt?: string;
   updatedAt?: string;
@@ -115,6 +118,7 @@ export interface Role {
   id: string;
   name: string;
   description: string;
+  categoria: RoleCategoria;
   createdAt: string;
   updatedAt?: string;
 }

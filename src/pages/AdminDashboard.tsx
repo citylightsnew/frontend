@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components';
-import { LogOut, Shield, Users, UserCog, LayoutDashboard } from 'lucide-react';
+import { LogOut, Shield, Users, UserCog, LayoutDashboard, Building2, MapPin, Calendar } from 'lucide-react';
 import logoImage from '../assets/logo.png';
 import UsersManagement from './UsersManagement';
 import RolesManagement from './RolesManagement';
+import UsuariosHabitacionesPage from './UsuariosHabitacionesPage';
+import AreasComunesPage from './booking/AreasComunesPage';
+import ReservasPage from './booking/ReservasPage';
 
-type ActiveView = 'dashboard' | 'users' | 'roles';
+type ActiveView = 'dashboard' | 'users' | 'roles' | 'habitaciones' | 'areas' | 'reservas';
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -21,6 +24,9 @@ export default function AdminDashboard() {
     { id: 'dashboard' as ActiveView, label: 'Panel Principal', icon: LayoutDashboard },
     { id: 'users' as ActiveView, label: 'Usuarios', icon: Users },
     { id: 'roles' as ActiveView, label: 'Roles', icon: UserCog },
+    { id: 'habitaciones' as ActiveView, label: 'Habitaciones', icon: Building2 },
+    { id: 'areas' as ActiveView, label: 'Áreas Comunes', icon: MapPin },
+    { id: 'reservas' as ActiveView, label: 'Reservas', icon: Calendar },
   ];
 
   return (
@@ -133,7 +139,7 @@ export default function AdminDashboard() {
 
               <div className="bg-white rounded-lg shadow p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Acciones Rápidas</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <Button
                     onClick={() => setActiveView('users')}
                     variant="outline"
@@ -150,6 +156,32 @@ export default function AdminDashboard() {
                   >
                     Gestionar Roles
                   </Button>
+                  <Button
+                    onClick={() => setActiveView('habitaciones')}
+                    variant="outline"
+                    icon={<Building2 size={20} />}
+                    fullWidth
+                  >
+                    Asignar Habitaciones
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    onClick={() => setActiveView('areas')}
+                    variant="outline"
+                    icon={<MapPin size={20} />}
+                    fullWidth
+                  >
+                    Áreas Comunes
+                  </Button>
+                  <Button
+                    onClick={() => setActiveView('reservas')}
+                    variant="outline"
+                    icon={<Calendar size={20} />}
+                    fullWidth
+                  >
+                    Gestionar Reservas
+                  </Button>
                 </div>
               </div>
             </div>
@@ -157,6 +189,9 @@ export default function AdminDashboard() {
 
           {activeView === 'users' && <UsersManagement />}
           {activeView === 'roles' && <RolesManagement />}
+          {activeView === 'habitaciones' && <UsuariosHabitacionesPage />}
+          {activeView === 'areas' && <AreasComunesPage />}
+          {activeView === 'reservas' && <ReservasPage />}
         </main>
       </div>
     </div>

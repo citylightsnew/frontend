@@ -19,6 +19,7 @@ export default function RolesManagement() {
   const [formData, setFormData] = useState<CreateRoleRequest>({
     name: '',
     description: '',
+    categoria: 'residente',
   });
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,6 +47,7 @@ export default function RolesManagement() {
     setFormData({
       name: '',
       description: '',
+      categoria: 'residente',
     });
     setShowModal(true);
   };
@@ -56,6 +58,7 @@ export default function RolesManagement() {
     setFormData({
       name: role.name,
       description: role.description,
+      categoria: role.categoria,
     });
     setShowModal(true);
   };
@@ -66,7 +69,7 @@ export default function RolesManagement() {
     setError(null);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -84,6 +87,7 @@ export default function RolesManagement() {
         const updateData: UpdateRoleRequest = {
           name: formData.name,
           description: formData.description,
+          categoria: formData.categoria,
         };
         
         await roleService.updateRole(selectedRole.id, updateData);
@@ -181,7 +185,18 @@ export default function RolesManagement() {
             <div key={role.id} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{role.name}</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">{role.name}</h3>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      role.categoria === 'superusuario' ? 'bg-purple-100 text-purple-700' :
+                      role.categoria === 'trabajador' ? 'bg-blue-100 text-blue-700' :
+                      'bg-green-100 text-green-700'
+                    }`}>
+                      {role.categoria === 'superusuario' ? 'Superusuario' :
+                       role.categoria === 'trabajador' ? 'Trabajador' :
+                       'Residente'}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-600">{role.description}</p>
                 </div>
               </div>
@@ -216,7 +231,7 @@ export default function RolesManagement() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900">
@@ -250,6 +265,28 @@ export default function RolesManagement() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Categoría
+                </label>
+                <select
+                  name="categoria"
+                  value={formData.categoria}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="residente">Residente</option>
+                  <option value="trabajador">Trabajador</option>
+                  <option value="superusuario">Superusuario</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.categoria === 'superusuario' && 'Administradores del sistema con acceso completo'}
+                  {formData.categoria === 'trabajador' && 'Personal del edificio (conserje, limpieza, seguridad, mantenimiento)'}
+                  {formData.categoria === 'residente' && 'Residentes y visitantes del edificio'}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Descripción
                 </label>
                 <textarea
@@ -277,7 +314,7 @@ export default function RolesManagement() {
       )}
 
       {showDeleteModal && roleToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <div className="flex items-center justify-center mb-4">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
@@ -300,7 +337,6 @@ export default function RolesManagement() {
               </p>
             </div>
 
-            {/* Información del rol a eliminar */}
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="mb-3">
                 <p className="text-sm font-medium text-gray-900 mb-1">{roleToDelete.name}</p>
